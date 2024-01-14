@@ -23,6 +23,7 @@ struct Person {
     struct Attraction *currentAttractionTarget;
     struct Attraction **favoriteRides;
     bool inAttraction;
+    bool inPark;
 };
 
 #endif

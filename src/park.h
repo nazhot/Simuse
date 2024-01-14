@@ -1,7 +1,7 @@
 #ifndef PARK_H
 #define PARK_H
 
-#include <inttypes.h>
+#include <inttypes.h> 
 
 /*
  * General idea with this is to keep the Park hidden to the user, since
@@ -14,7 +14,7 @@
 void park_initialize();
 void park_initializeRandomGuests( const uint32_t numGuests );
 void park_initializeAttractionsFromFile( const char *filePath );
-void park_setTickRate( const uint32_t nanoseconds );
+void park_setTickSeconds( const float seconds );
 void park_run();
 
 #endif
