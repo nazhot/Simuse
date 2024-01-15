@@ -13,6 +13,10 @@ enum PersonalityType {
 
 struct Person {
     enum PersonalityType personality;
+    uint8_t expectedArrivalTime;
+    uint8_t actualArrivalTime;
+    uint8_t expectedLeaveTime;
+    uint8_t actualLeaveTime;
     uint16_t x;
     uint16_t y;
     uint8_t hunger;
@@ -24,6 +28,7 @@ struct Person {
     struct Attraction **favoriteRides;
     bool inAttraction;
     bool inPark;
+    bool inLine;
 };
 
 void person_update( struct Person *person );
