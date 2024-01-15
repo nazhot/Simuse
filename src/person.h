@@ -26,4 +26,6 @@ struct Person {
     bool inPark;
 };
 
+void person_update( struct Person *person );
+
 #endif

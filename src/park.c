@@ -1,4 +1,5 @@
 #include "park.h"
+#include "person.h"
 #include "attraction.h"
 #include <stdbool.h>
 #include <time.h>
@@ -33,7 +34,9 @@ static void park_updateAttractions() {
 }
 
 static void park_updatePersons() {
-
+    for ( int i = 0; i < park.numPersons; ++i ) {
+        person_update( park.personList[i] );
+    }
 }
 
 void park_run() {

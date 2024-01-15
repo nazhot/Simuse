@@ -17,4 +17,6 @@ struct Attraction {
     uint16_t numPeopleRiding; 
 };
 
+void attraction_update( struct Attraction *attraction );
+
 #endif
