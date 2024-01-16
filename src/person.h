@@ -25,6 +25,7 @@ struct Person {
     uint8_t currentPatience;
     uint8_t defaultPatience;
     struct Attraction *currentAttractionTarget;
+    uint32_t distanceToAttractionTarget;
     struct Attraction **favoriteRides;
     bool inAttraction;
     bool inPark;
