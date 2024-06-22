@@ -8,8 +8,11 @@
 typedef struct Park {
     uint timeOpen;
     uint currentTime;
+    uint numAttractions;
     Attraction *attractions;
+    uint numGuests;
     Guest *guests;
+    uint **attractionWalkTimes;
 } Park;
 
 #endif

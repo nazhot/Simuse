@@ -21,6 +21,8 @@ typedef struct Attraction {
     uint lineFastLaneRatio;
     uint carArrivalTimes[256];
     uint carOccupancies[256];
+    uint firstOpenCarIndex;
+    uint numOpenCars;
 } Attraction;
 
 #endif
