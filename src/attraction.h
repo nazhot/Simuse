@@ -1,22 +1,26 @@
 #ifndef ATTRACTION_H
 #define ATTRACTION_H
 
-#include <inttypes.h>
-enum AttractionType {
-    RIDE,
-    FOOD_STAND
-};
+#include <stdlib.h>
 
-struct Attraction {
-    enum AttractionType type;
-    uint16_t x;
-    uint16_t y;
-    uint8_t thrillRating;
-    uint8_t minutesPerRide;
-    uint16_t peoplePerHour;
-    uint16_t numPeopleRiding; 
-};
+typedef struct Vec2 {
+    int x;
+    int y;
+} Vec2;
 
-void attraction_update( struct Attraction *attraction );
+typedef struct Attraction {
+    uint popularity;
+    char name[256];
+    Vec2 position;
+    uint guestsInFastLane;
+    uint rideTime;
+    uint numCars;
+    uint guestsPerCar;
+    uint guestsInLine;
+    uint currentWaitTime;
+    uint lineFastLaneRatio;
+    uint carArrivalTimes[256];
+    uint carOccupancies[256];
+} Attraction;
 
 #endif
