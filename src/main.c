@@ -15,6 +15,13 @@ int main( int argc, char *argv[] ) {
         
     }
 
+    uint attractionWalkTimes[numAttractions + 1][numAttractions + 1];
+    for ( uint i = 0; i < numAttractions + 1; ++i ) {
+        for ( uint j = 0; j < numAttractions + 1; ++j ) {
+            //set table to | xi - xj | + | yi - yj |
+        }
+    }
+
 
     Park park = { .numGuests = numGuests,
                   .guests = guests,
@@ -63,6 +70,20 @@ int main( int argc, char *argv[] ) {
                     break;
             }
         }
+
+        for ( uint i = 0; i < park.numAttractions; ++i ) {
+            Attraction *attraction = &park.attractions[i];
+            for ( uint j = 0; j < attraction->numCars; ++j ) {
+                if ( attraction->carArrivalTimes[j] == 0 && attraction->carOccupancies[j] > 0 ) {
+                    attraction->carArrivalTimes[j] = attraction->rideTime;
+                    attraction->guestsInLine -= attraction->guestsPerCar;
+                }  else if ( attraction->carArrivalTimes[j] > 0 ) {
+                    attraction->carArrivalTimes[j]--;
+                }
+            }
+            attraction->currentWaitTime = attraction->currentWaitTimeConstant * attraction->guestsInLine;
+        }
+
         park.currentTime++;
     }
 

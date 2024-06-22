@@ -2,6 +2,7 @@
 #define ATTRACTION_H
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct Vec2 {
     int x;
@@ -18,11 +19,13 @@ typedef struct Attraction {
     uint guestsPerCar;
     uint guestsInLine;
     uint currentWaitTime;
+    uint currentWaitTimeConstant;
     uint lineFastLaneRatio;
     uint carArrivalTimes[256];
     uint carOccupancies[256];
     uint firstOpenCarIndex;
     uint numOpenCars;
+    bool carOpen;
 } Attraction;
 
 #endif
