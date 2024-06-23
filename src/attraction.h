@@ -4,14 +4,16 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+//each unit of x/y is 4 feet, so that a distance of 1 is ~1 sec of travel time
+
 typedef struct Vec2 {
     int x;
     int y;
 } Vec2;
 
 typedef struct Attraction {
+    char *name;
     uint popularity;
-    char name[256];
     Vec2 position;
     uint guestsInFastLane;
     uint rideTime;
@@ -19,7 +21,7 @@ typedef struct Attraction {
     uint guestsPerCar;
     uint guestsInLine;
     uint currentWaitTime;
-    uint currentWaitTimeConstant;
+    float currentWaitTimeConstant;
     uint lineFastLaneRatio;
     uint carArrivalTimes[256];
     uint carOccupancies[256];
@@ -27,5 +29,8 @@ typedef struct Attraction {
     uint numOpenCars;
     bool carOpen;
 } Attraction;
+
+Attraction attraction_create( char *name, uint popularity, Vec2 position, 
+                              uint rideTime, uint numCars, uint guestsPerCar );
 
 #endif

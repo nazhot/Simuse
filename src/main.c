@@ -5,8 +5,13 @@
 #include "park.h"
 
 int main( int argc, char *argv[] ) {
-    uint numAttractions = 5;
+    uint numAttractions = 4;
     Attraction attractions[numAttractions];
+
+    attractions[0] = attraction_create( "Attraction 1", 100, ( Vec2 ) { 600, 0 }, 120, 3, 10 );
+    attractions[1] = attraction_create( "Attraction 2", 100, ( Vec2 ) { 600, 600 }, 120, 3, 10 );
+    attractions[2] = attraction_create( "Attraction 3", 100, ( Vec2 ) { -600, 600 }, 120, 3, 10 );
+    attractions[3] = attraction_create( "Attraction 4", 100, ( Vec2 ) { -600, 0 }, 120, 3, 10 );
     
 
     uint numGuests = 500;
