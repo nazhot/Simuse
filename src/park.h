@@ -15,4 +15,6 @@ typedef struct Park {
     uint **attractionWalkTimes;
 } Park;
 
+int guest_determineNextAttraction( Park *park, Guest *guest );
+
 #endif

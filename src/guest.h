@@ -2,6 +2,9 @@
 #define GUEST_H
 
 #include <stdlib.h>
+#include <stdbool.h>
+
+struct Park;
 
 typedef enum GuestStatus{
     ARRIVING,
@@ -25,5 +28,9 @@ typedef struct Guest {
     uint numAttractionsRidden;
     uint attractionsRiddenIndexes[256];
 } Guest;
+
+int guest_determineNextAttraction( struct Park *park, Guest *guest );
+bool guest_decideToRideAttraction( struct Park *park, Guest *guest );
+
 
 #endif

@@ -36,7 +36,7 @@ int main( int argc, char *argv[] ) {
             Guest *guest = &park.guests[i];
             Attraction *currentAttraction = &park.attractions[guest->currentAttractionIndex];
             if ( park.currentTime == guest->enterTime ) {
-                guest->currentAttractionIndex = guest_determineNextAttraction( &park, &guest );
+                guest->currentAttractionIndex = guest_determineNextAttraction( &park, guest );
                 guest->currentStatus = WALKING;
                 guest->timeToAttraction = park.attractionWalkTimes[0][guest->currentAttractionIndex];
                 continue;
@@ -44,7 +44,7 @@ int main( int argc, char *argv[] ) {
             switch ( guest->currentStatus ) {
                 case WALKING:
                     guest->timeToAttraction--;
-                    if ( guest->timeToAttraction > 0 || !guest_decideToRideAttraction( guest, &park ) ) break;
+                    if ( guest->timeToAttraction > 0 || !guest_decideToRideAttraction( &park, guest ) ) break;
 
                     guest->currentStatus = IN_LINE;
                     guest->linePosition = currentAttraction->guestsInLine++;
