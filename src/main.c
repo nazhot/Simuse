@@ -20,14 +20,17 @@ int main( int argc, char *argv[] ) {
         
     }
 
+    //0 index is exit, ( 0,0 )
     uint attractionWalkTimes[numAttractions + 1][numAttractions + 1];
-    for ( uint i = 0; i < numAttractions + 1; ++i ) {
-        for ( uint j = 0; j < numAttractions + 1; ++j ) {
-            //set table to | xi - xj | + | yi - yj |
+    attractionWalkTimes[0][0] = 0;
+    for ( uint i = 0; i < numAttractions; ++i ) {
+        attractionWalkTimes[0][i + 1] = abs( attractions[i].position.x ) + abs( attractions[i].position.y );
+        attractionWalkTimes[i + 1][0] = abs( attractions[i].position.x ) + abs( attractions[i].position.y );
+        for ( uint j = 0; j < numAttractions; ++j ) {
+            attractionWalkTimes[i + 1][j + 1] = abs( attractions[i].position.x - attractions[j].position.x ) +
+                                                abs( attractions[i].position.y - attractions[j].position.y );
         }
     }
-
-
     Park park = { .numGuests = numGuests,
                   .guests = guests,
                   .timeOpen = 43200, //half a day
