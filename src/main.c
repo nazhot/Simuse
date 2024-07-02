@@ -115,15 +115,10 @@ int main( int argc, char *argv[] ) {
 
         for ( uint i = 0; i < park.numAttractions; ++i ) {
             Attraction *attraction = &park.attractions[i];
-            for ( uint j = 0; j < attraction->numCars; ++j ) {
-                if ( attraction->carArrivalTimes[j] == 0 && attraction->carOccupancies[j] > 0 ) {
-                    attraction->carArrivalTimes[j] = attraction->rideTime;
-                    attraction->guestsInLine -= attraction->guestsPerCar;
-                }  else if ( attraction->carArrivalTimes[j] > 0 ) {
-                    attraction->carArrivalTimes[j]--;
-                }
-            }
-            attraction->currentWaitTime = attraction->currentWaitTimeConstant * attraction->guestsInLine;
+            attraction_updateArrivalTimes( attraction );
+            attraction_updateOpenCars( attraction );
+            attraction_loadOpenCar( attraction );
+            attraction_unloadReturnedCar( attraction );
         }
 
         park.currentTime++;
