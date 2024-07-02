@@ -24,8 +24,9 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.
-CFLAGS := $(INC_FLAGS) -MMD -MP -Wall -g
+override CFLAGS := $(INC_FLAGS) -MMD -MP -Wall -g $(CFLAGS)
 LDFLAGS := -lSDL2 -g
+
 
 # The final build step.
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
@@ -34,7 +35,11 @@ $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 # Build step for C source
 $(BUILD_DIR)/%.c.o: %.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(OPTIONAL_FLAGS) -c $< -o $@
+
+.PHONY: debug
+debug:
+	make clean CFLAGS=-DDEBUG
 
 
 .PHONY: clean

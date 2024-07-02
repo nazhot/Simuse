@@ -4,6 +4,15 @@
 #include "attraction.h"
 #include "guest.h"
 #include "park.h"
+#include <assert.h>
+
+# define __ASSERT_VOID_CAST (void)
+
+#ifdef DEBUG
+#define LOG( ... ) printf( __VA_ARGS__ )
+#else
+#define LOG( str ) (__ASSERT_VOID_CAST( 0 ))
+#endif
 
 int main( int argc, char *argv[] ) {
     srand48( time( NULL ) );
@@ -56,6 +65,7 @@ int main( int argc, char *argv[] ) {
                 guest->currentAttractionIndex = guest_determineNextAttraction( &park, guest );
                 guest->currentStatus = WALKING;
                 guest->timeToAttraction = currentAttraction->attractionWalkTimes[0];
+                if ( i == 0 ) LOG( "GUEST ENTERING\n" );
                 continue;
             }
             switch ( guest->currentStatus ) {
