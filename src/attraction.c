@@ -43,6 +43,7 @@ void attraction_loadOpenCar( Attraction *attraction ) {
     attraction->carArrivalTimes[attraction->firstOpenCarIndex] = attraction->rideTime;
     attraction->numGuestsLastLoaded = numToLoad;
     attraction->carIndexLastLoaded = attraction->firstOpenCarIndex;
+    attraction->guestsInLine -= numToLoad;
 }
 
 void attraction_unloadReturnedCar( Attraction *attraction ) {
