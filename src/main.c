@@ -76,18 +76,23 @@ int main( int argc, char *argv[] ) {
             Attraction *currentAttraction = &park.attractions[guest->currentAttractionIndex];
             switch ( guest->currentStatus ) {
                 case WALKING:
-                    guest->timeToAttraction--;
-                    if ( guest->timeToAttraction > 0 ) break;
-
-                    guest->currentStatus = IN_LINE;
-                    guest->linePosition = currentAttraction->guestsInLine++;
-                    if ( i == 0 ) {
-                        LOG( "GUEST ARRIVED, CURRENTLY NUMBER %u IN LINE: %u\n", guest->linePosition, park.currentTime );
+                    if ( guest->timeToAttraction == 0 ) {
+                        if ( guest_decideToRideAttraction( &park, guest ) ) {
+                            guest->currentStatus = IN_LINE;
+                            guest->linePosition = currentAttraction->guestsInLine++;
+                            if ( i == 0 ) {
+                                LOG( "GUEST ARRIVED, CURRENTLY NUMBER %u IN LINE: %u\n", guest->linePosition, park.currentTime );
+                            }
+                        } else { 
+                            guest_determineNextAttraction( &park, guest );
+                        }
+                        break;
                     }
+                    --guest->timeToAttraction;
                     break;
                 case LEAVING:
-                    guest->timeToAttraction--;
                     if ( guest->timeToAttraction == 0 ) guest->currentStatus = GONE;
+                    guest->timeToAttraction--;
                     if ( i == 0 && guest->currentStatus == GONE ) {
                         LOG( "GUEST LEFT AT %u\n", park.currentTime );
                     }
