@@ -24,8 +24,8 @@ void guest_determineNextAttraction( const Park *park, Guest *guest ) {
     Attraction *currentAttraction = &park->attractions[guest->currentAttractionIndex];
     for ( uint i = 0; i < park->numAttractions; ++i ) {  
         uint attractionWalkTime = currentAttraction->attractionWalkTimes[i + 1];
-        score = guest->attractionWeights[i] / 
-                ( attractionWalkTime * numTimesRiddenAttraction( guest, i ) + 1);
+        score = ( guest->attractionWeights[i] * guest->attractionWeights[i] ) / 
+                ( attractionWalkTime / 60 * numTimesRiddenAttraction( guest, i ) + 1);
         if ( score > highestScore ) {
             highestScore = score;
             index = i;

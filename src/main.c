@@ -30,8 +30,8 @@ int main( int argc, char *argv[] ) {
     attractions[3] = attraction_create( "Attraction 3", 100, ( Vec2 ) { -600, 600 }, 120, 3, 10 );
     attractions[4] = attraction_create( "Attraction 4", 100, ( Vec2 ) { -600, 0 }, 120, 3, 10 );
 
-    uint numGuests = 500;
-    Guest guests[numGuests];
+    uint numGuests = 5000;
+    Guest *guests = malloc( sizeof( Guest ) * numGuests );
     {
         uint attractionWeights[numAttractions];
         attractionWeights[0] = 0;
@@ -39,7 +39,7 @@ int main( int argc, char *argv[] ) {
         uint exitTime;
         for ( uint i = 0; i < numGuests; ++i ) {
             for ( uint i = 1; i < numAttractions; ++i ) {
-                attractionWeights[i] = 20;
+                attractionWeights[i] = ( uint ) drand48() * ( 99 ) + 1;
             }
             enterTime = ( uint ) drand48() * ( timeOpen - 10800 ); //10800 is 3 hours
             exitTime = ( uint ) drand48() * ( timeOpen - enterTime )+ 10800;
@@ -77,7 +77,7 @@ int main( int argc, char *argv[] ) {
             switch ( guest->currentStatus ) {
                 case WALKING:
                     guest->timeToAttraction--;
-                    if ( guest->timeToAttraction > 0 || !guest_decideToRideAttraction( &park, guest ) ) break;
+                    if ( guest->timeToAttraction > 0 ) break;
 
                     guest->currentStatus = IN_LINE;
                     guest->linePosition = currentAttraction->guestsInLine++;
@@ -97,11 +97,12 @@ int main( int argc, char *argv[] ) {
                         ++guest->totalTimeInLine;
                         break;
                     }
-                    if ( guest->linePosition > currentAttraction->numGuestsLastLoaded ) {
+                    if ( guest->linePosition >= currentAttraction->numGuestsLastLoaded ) {
                         if ( i == 0 ) {
                             LOG( "MOVED IN LINE FROM %u to %u: %u\n", guest->linePosition, guest->linePosition - currentAttraction->numGuestsLastLoaded, park.currentTime );
                         }
                         guest->linePosition -= currentAttraction->numGuestsLastLoaded;
+                        ++guest->totalTimeInLine;
                         break;
                     }
 
@@ -109,6 +110,7 @@ int main( int argc, char *argv[] ) {
                     guest->linePosition = 0;
                     guest->carIndex = currentAttraction->carIndexLastLoaded;
                     guest->currentStatus = RIDING;
+                    guest->attractionsRiddenIndexes[guest->numAttractionsRidden++] = guest->currentAttractionIndex;
                     if ( i == 0 ) {
                         LOG( "STARTING RIDING: %u\n", park.currentTime );
                     }
@@ -134,8 +136,11 @@ int main( int argc, char *argv[] ) {
             }
         }
 
-        for ( uint i = 0; i < park.numAttractions; ++i ) {
+        for ( uint i = 1; i < park.numAttractions; ++i ) {
             Attraction *attraction = &park.attractions[i];
+            if ( i == 1 ) {
+                LOG( "Guests in line: %u\n", attraction->guestsInLine );
+            }
             attraction_updateArrivalTimes( attraction );
             attraction_updateOpenCars( attraction );
             attraction_loadOpenCar( attraction );
