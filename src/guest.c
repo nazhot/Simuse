@@ -15,14 +15,15 @@ static int numTimesRiddenAttraction( const Guest *guest, const uint attractionIn
 }
 
 
-void guest_determineNextAttraction( const Park *park, Guest *guest ) {
+void guest_determineNextAttraction( const Park *park, Guest *guest, const bool allowSameAttraction ) {
     //index 0, aka exit, will always have a score of 0 because the attraction weight should be 0
     uint index = 0;
     uint highestScore = 0;
     uint minWalkingTime = UINT_MAX;
     uint score;
     Attraction *currentAttraction = &park->attractions[guest->currentAttractionIndex];
-    for ( uint i = 0; i < park->numAttractions; ++i ) {  
+    for ( uint i = 1; i < park->numAttractions; ++i ) {  
+        if ( !allowSameAttraction && i == guest->currentAttractionIndex ) continue;
         uint attractionWalkTime = currentAttraction->attractionWalkTimes[i + 1];
         score = ( guest->attractionWeights[i] * guest->attractionWeights[i] ) / 
                 ( attractionWalkTime / 60 * numTimesRiddenAttraction( guest, i ) + 1);
@@ -34,7 +35,7 @@ void guest_determineNextAttraction( const Park *park, Guest *guest ) {
             minWalkingTime = attractionWalkTime;
         }
     }
-    if ( minWalkingTime >= ( park->timeOpen - park->currentTime ) || index == 0 ) { //time to leave
+    if ( minWalkingTime >= ( park->timeOpen - park->currentTime ) ) { //time to leave
         guest->currentStatus = LEAVING;
         guest->currentAttractionIndex = 0;
         guest->timeToAttraction = currentAttraction->attractionWalkTimes[0];
@@ -52,7 +53,8 @@ void guest_determineNextAttraction( const Park *park, Guest *guest ) {
 }
 
 bool guest_decideToRideAttraction( const Park *park, const Guest *guest ) {
-    return true;
+    int guestExpectedWait = 120 - guest->attractionWeights[guest->currentAttractionIndex];
+    return park->attractions[guest->currentAttractionIndex].currentWaitTime <= guestExpectedWait;
 }
 
 Guest guest_create( const uint *attractionWeights, const uint numAttractions,

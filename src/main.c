@@ -38,11 +38,11 @@ int main( int argc, char *argv[] ) {
         uint enterTime;
         uint exitTime;
         for ( uint i = 0; i < numGuests; ++i ) {
-            for ( uint i = 1; i < numAttractions; ++i ) {
-                attractionWeights[i] = ( uint ) drand48() * ( 99 ) + 1;
+            for ( uint j = 1; j < numAttractions; ++j ) {
+                attractionWeights[j] = ( uint ) ( drand48() * 99 + 1 );
             }
-            enterTime = ( uint ) drand48() * ( timeOpen - 10800 ); //10800 is 3 hours
-            exitTime = ( uint ) drand48() * ( timeOpen - enterTime )+ 10800;
+            enterTime = ( uint ) ( drand48() * ( timeOpen - 10800 ) ); //10800 is 3 hours
+            exitTime = ( uint ) ( drand48() * ( timeOpen - enterTime )+ 10800 );
             guests[i] = guest_create( attractionWeights, numAttractions, enterTime, exitTime );
         }
     }
@@ -62,11 +62,15 @@ int main( int argc, char *argv[] ) {
         .attractions = attractions };
 
 
+    bool attractionLineJoined[numAttractions];
     while ( park.currentTime < park.timeOpen ) {
+        for ( uint i = 0; i < numAttractions; ++i ) {
+            attractionLineJoined[i] = false;
+        }
         for ( uint i = 0; i < park.numGuests; ++i ) {
             Guest *guest = &park.guests[i];
             if ( park.currentTime == guest->enterTime ) {
-                guest_determineNextAttraction( &park, guest );
+                guest_determineNextAttraction( &park, guest, false );
                 if ( i == 0 ) {
                     LOG( "GUEST ENTERING: %u\n", park.currentTime );
                     LOG( "HEADING TO ATTRACTION: %s\n", park.attractions[guest->currentAttractionIndex].name );
@@ -83,8 +87,12 @@ int main( int argc, char *argv[] ) {
                             if ( i == 0 ) {
                                 LOG( "GUEST ARRIVED, CURRENTLY NUMBER %u IN LINE: %u\n", guest->linePosition, park.currentTime );
                             }
+                            attractionLineJoined[guest->currentAttractionIndex] = true;
                         } else { 
-                            guest_determineNextAttraction( &park, guest );
+                            guest_determineNextAttraction( &park, guest, false );
+                            if ( i == 0 ) {
+                                LOG( "GUEST DECIDED ON NEW ATTRACTION, %s: %u\n", park.attractions[guest->currentAttractionIndex].name, park.currentTime );
+                            }
                         }
                         break;
                     }
@@ -124,7 +132,7 @@ int main( int argc, char *argv[] ) {
                     //car still occupied, means it's still going
                     if ( currentAttraction->carOccupancies[guest->carIndex] ) break;
                     //car unoccupied, just returned
-                    guest_determineNextAttraction( &park, guest );
+                    guest_determineNextAttraction( &park, guest, true );
                     if ( i == 0 ) {
                         LOG( "GUEST FINISHED RIDE, NEXT ATTRACTION %s: %u\n", park.attractions[guest->currentAttractionIndex].name, park.currentTime );
                     }
@@ -143,8 +151,8 @@ int main( int argc, char *argv[] ) {
 
         for ( uint i = 1; i < park.numAttractions; ++i ) {
             Attraction *attraction = &park.attractions[i];
-            if ( i == 1 ) {
-                LOG( "Guests in line: %u\n", attraction->guestsInLine );
+            if ( attractionLineJoined[i] ) {
+                attraction_updateWaitTime( attraction );
             }
             attraction_updateArrivalTimes( attraction );
             attraction_updateOpenCars( attraction );

@@ -23,6 +23,10 @@ Attraction attraction_create( char *name, uint popularity, Vec2 position,
                             .carIndexLastLoaded = 0 };
 }
 
+void attraction_updateWaitTime( Attraction *attraction ) {
+    attraction->currentWaitTime = attraction->currentWaitTimeConstant * attraction->guestsInLine;
+}
+
 void attraction_updateOpenCars( Attraction *attraction ) {
     const uint numCars = attraction->numCars;
     for ( uint i = 0; i < numCars; ++i ) {
@@ -44,6 +48,7 @@ void attraction_loadOpenCar( Attraction *attraction ) {
     attraction->numGuestsLastLoaded = numToLoad;
     attraction->carIndexLastLoaded = attraction->firstOpenCarIndex;
     attraction->guestsInLine -= numToLoad;
+    attraction_updateWaitTime( attraction );
 }
 
 void attraction_unloadReturnedCar( Attraction *attraction ) {
