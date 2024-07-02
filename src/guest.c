@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int numTimesRiddenAttraction( Guest *guest, uint attractionIndex ) {
+static int numTimesRiddenAttraction( const Guest *guest, const uint attractionIndex ) {
     uint numTimes = 0;
     for ( uint i = 0; i < 256; ++i ) { //TODO: update 256 to be stored in a variable somewhere
         if ( guest->attractionsRiddenIndexes[i] == attractionIndex ) {
@@ -15,29 +15,36 @@ static int numTimesRiddenAttraction( Guest *guest, uint attractionIndex ) {
 }
 
 
-int guest_determineNextAttraction( Park *park, Guest *guest ) {
+int guest_determineNextAttraction( const Park *park, const Guest *guest ) {
     uint index = 0;
     uint highestScore = 0;
     uint minWalkingTime = UINT_MAX;
     uint score;
+    Attraction *currentAttraction = &park->attractions[guest->currentAttractionIndex];
     for ( uint i = 0; i < park->numAttractions; ++i ) {  
+        uint attractionWalkTime = currentAttraction->attractionWalkTimes[i + 1];
         score = guest->attractionWeights[i] / 
-                ( park->attractionWalkTimes[i][guest->currentAttractionIndex] * numTimesRiddenAttraction( guest, i ) );
+                ( attractionWalkTime * numTimesRiddenAttraction( guest, i ) );
         if ( score > highestScore ) {
             highestScore = score;
             index = i;
         }
-        if ( park->attractionWalkTimes[i][guest->currentAttractionIndex] < minWalkingTime ) {
-            minWalkingTime = park->attractionWalkTimes[i][guest->currentAttractionIndex];
+        if ( attractionWalkTime < minWalkingTime ) {
+            minWalkingTime = attractionWalkTime;
         }
     }
     if ( minWalkingTime >= ( park->timeOpen - park->currentTime ) ) {
-        return -1;
+        return 0;
     }
-    return index;
+    return index + 1;
 
 }
 
-bool guest_decideToRideAttraction( Park *park, Guest *guest ) {
+bool guest_decideToRideAttraction( const Park *park, const Guest *guest ) {
     return true;
+}
+
+Guest guest_create( const uint *attractionWeights, const uint numAttractions,
+                    const uint enterTime, const uint exitTime ) {
+    return ( Guest ) {};
 }

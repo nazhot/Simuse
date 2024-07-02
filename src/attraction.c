@@ -17,5 +17,6 @@ Attraction attraction_create( char *name, uint popularity, Vec2 position,
                             .carArrivalTimes = {0},
                             .carOccupancies = {0},
                             .numOpenCars = numCars,
-                            .carOpen = true }; 
+                            .carOpen = true,
+                            .attractionWalkTimes = {0} }; 
 }

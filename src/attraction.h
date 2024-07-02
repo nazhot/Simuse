@@ -28,6 +28,7 @@ typedef struct Attraction {
     uint firstOpenCarIndex;
     uint numOpenCars;
     bool carOpen;
+    uint attractionWalkTimes[256];
 } Attraction;
 
 Attraction attraction_create( char *name, uint popularity, Vec2 position, 

@@ -1,42 +1,51 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "attraction.h"
 #include "guest.h"
 #include "park.h"
 
 int main( int argc, char *argv[] ) {
+    srand48( time( NULL ) );
     uint numAttractions = 4;
+    uint timeOpen = 43200;
     Attraction attractions[numAttractions];
 
     attractions[0] = attraction_create( "Attraction 1", 100, ( Vec2 ) { 600, 0 }, 120, 3, 10 );
     attractions[1] = attraction_create( "Attraction 2", 100, ( Vec2 ) { 600, 600 }, 120, 3, 10 );
     attractions[2] = attraction_create( "Attraction 3", 100, ( Vec2 ) { -600, 600 }, 120, 3, 10 );
     attractions[3] = attraction_create( "Attraction 4", 100, ( Vec2 ) { -600, 0 }, 120, 3, 10 );
-    
 
     uint numGuests = 500;
     Guest guests[numGuests];
-    for ( uint i = 0; i < numGuests; ++i ) {
-        
+    {
+        uint attractionWeights[numAttractions];
+        uint enterTime;
+        uint exitTime;
+        for ( uint i = 0; i < numGuests; ++i ) {
+            for ( uint i = 0; i < numAttractions; ++i ) {
+                attractionWeights[i] = 20;
+            }
+            enterTime = ( uint ) drand48() * ( timeOpen - 10800 ); //10800 is 3 hours
+            exitTime = ( uint ) drand48() * ( timeOpen - enterTime )+ 10800;
+            guests[i] = guest_create( attractionWeights, numAttractions, enterTime, exitTime );
+        }
     }
 
     //0 index is exit, ( 0,0 )
-    uint attractionWalkTimes[numAttractions + 1][numAttractions + 1];
-    attractionWalkTimes[0][0] = 0;
     for ( uint i = 0; i < numAttractions; ++i ) {
-        attractionWalkTimes[0][i + 1] = abs( attractions[i].position.x ) + abs( attractions[i].position.y );
-        attractionWalkTimes[i + 1][0] = abs( attractions[i].position.x ) + abs( attractions[i].position.y );
+        attractions[i].attractionWalkTimes[0] = abs( attractions[i].position.x ) + abs( attractions[i].position.y );
         for ( uint j = 0; j < numAttractions; ++j ) {
-            attractionWalkTimes[i + 1][j + 1] = abs( attractions[i].position.x - attractions[j].position.x ) +
-                                                abs( attractions[i].position.y - attractions[j].position.y );
+            attractions[i].attractionWalkTimes[j + 1] = abs( attractions[i].position.x - attractions[j].position.x ) +
+                                                        abs( attractions[i].position.y - attractions[j].position.y );
         }
     }
     Park park = { .numGuests = numGuests,
-                  .guests = guests,
-                  .timeOpen = 43200, //half a day
-                  .currentTime = 0,
-                  .numAttractions = numAttractions,
-                  .attractions = attractions };
+        .guests = guests,
+        .timeOpen = timeOpen,
+        .currentTime = 0,
+        .numAttractions = numAttractions,
+        .attractions = attractions };
 
 
     while ( park.currentTime < park.timeOpen ) {
@@ -46,7 +55,7 @@ int main( int argc, char *argv[] ) {
             if ( park.currentTime == guest->enterTime ) {
                 guest->currentAttractionIndex = guest_determineNextAttraction( &park, guest );
                 guest->currentStatus = WALKING;
-                guest->timeToAttraction = park.attractionWalkTimes[0][guest->currentAttractionIndex];
+                guest->timeToAttraction = currentAttraction->attractionWalkTimes[0];
                 continue;
             }
             switch ( guest->currentStatus ) {
