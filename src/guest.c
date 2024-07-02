@@ -24,7 +24,7 @@ int guest_determineNextAttraction( const Park *park, const Guest *guest ) {
     for ( uint i = 0; i < park->numAttractions; ++i ) {  
         uint attractionWalkTime = currentAttraction->attractionWalkTimes[i + 1];
         score = guest->attractionWeights[i] / 
-                ( attractionWalkTime * numTimesRiddenAttraction( guest, i ) );
+                ( attractionWalkTime * numTimesRiddenAttraction( guest, i ) + 1);
         if ( score > highestScore ) {
             highestScore = score;
             index = i;
@@ -46,5 +46,16 @@ bool guest_decideToRideAttraction( const Park *park, const Guest *guest ) {
 
 Guest guest_create( const uint *attractionWeights, const uint numAttractions,
                     const uint enterTime, const uint exitTime ) {
-    return ( Guest ) {};
+    Guest guest = { .attractionWeights = {0},
+                    .currentAttractionIndex = 0,
+                    .currentStatus = ARRIVING,
+                    .timeToAttraction = 0,
+                    .linePosition = 0,
+                    .carIndex = 0,
+                    .enterTime = enterTime,
+                    .exitTime = exitTime,
+                    .totalTimeInLine = 0,
+                    .numAttractionsRidden = 0,
+                    .attractionsRiddenIndexes = {0} };
+    return guest;
 }
