@@ -11,7 +11,7 @@
 #ifdef DEBUG
 #define LOG( ... ) printf( __VA_ARGS__ )
 #else
-#define LOG( str ) (__ASSERT_VOID_CAST( 0 ))
+#define LOG( ... ) (__ASSERT_VOID_CAST( 0 ))
 #endif
 
 int main( int argc, char *argv[] ) {
@@ -65,7 +65,10 @@ int main( int argc, char *argv[] ) {
                 guest->currentAttractionIndex = guest_determineNextAttraction( &park, guest );
                 guest->currentStatus = WALKING;
                 guest->timeToAttraction = currentAttraction->attractionWalkTimes[0];
-                if ( i == 0 ) LOG( "GUEST ENTERING\n" );
+                if ( i == 0 ) {
+                    LOG( "GUEST ENTERING: %u\n", park.currentTime );
+                    LOG( "HEADING TO ATTRACTION: %s\n", currentAttraction->name );
+                }
                 continue;
             }
             switch ( guest->currentStatus ) {
@@ -75,20 +78,32 @@ int main( int argc, char *argv[] ) {
 
                     guest->currentStatus = IN_LINE;
                     guest->linePosition = currentAttraction->guestsInLine++;
+                    if ( i == 0 ) {
+                        LOG( "GUEST ARRIVED, CURRENTLY NUMBER %u IN LINE: %u\n", guest->linePosition, park.currentTime );
+                    }
                     break;
                 case LEAVING:
                     guest->timeToAttraction--;
                     if ( guest->timeToAttraction == 0 ) guest->currentStatus = GONE;
+                    if ( i == 0 && guest->currentStatus == GONE ) {
+                        LOG( "GUEST LEFT AT %u\n", park.currentTime );
+                    }
                     break;
                 case IN_LINE:
                     if ( currentAttraction->numOpenCars > 0 ) {
                         if ( guest->linePosition < park.attractions[guest->currentAttractionIndex].guestsPerCar ) {
                             guest->linePosition = 0;
                             guest->currentStatus = RIDING;
+                            if ( i == 0 ) {
+                                LOG( "GUEST RIDING RIDE: %u\n", park.currentTime );
+                            }
                             currentAttraction->carOccupancies[currentAttraction->firstOpenCarIndex]++;
                         } else {
                             guest->linePosition -= currentAttraction->guestsPerCar;
                             guest->totalTimeInLine++;
+                            if ( i == 0 ) {
+                                LOG( "GUEST MOVED UP IN LINE, NEW POSITION %u: %u\n", guest->linePosition, park.currentTime );
+                            }
                         }
                     } else {
                         guest->totalTimeInLine++;

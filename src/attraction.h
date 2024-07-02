@@ -33,5 +33,7 @@ typedef struct Attraction {
 
 Attraction attraction_create( char *name, uint popularity, Vec2 position, 
                               uint rideTime, uint numCars, uint guestsPerCar );
+void attraction_updateOpenCars( Attraction *attraction );
+void attraction_unloadReturnedCar( Attraction *attraction );
 
 #endif

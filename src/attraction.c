@@ -20,3 +20,24 @@ Attraction attraction_create( char *name, uint popularity, Vec2 position,
                             .carOpen = true,
                             .attractionWalkTimes = {0} }; 
 }
+
+void attraction_updateOpenCars( Attraction *attraction ) {
+    const uint numCars = attraction->numCars;
+    for ( uint i = 0; i < numCars; ++i ) {
+        if ( attraction->carArrivalTimes[i] == 0 && attraction->carOccupancies[i] == 0 ) {
+            attraction->carOpen = true;
+            attraction->firstOpenCarIndex = i;
+            return;
+        }
+    }
+    attraction->carOpen = false;
+}
+
+void attraction_unloadReturnedCar( Attraction *attraction ) {
+    const uint numCars = attraction->numCars;
+    for ( uint i = 0; i < numCars; ++i ) {
+        if ( attraction->carArrivalTimes[i] == 0 && attraction->carOccupancies[i] > 0 ) {
+            attraction->carOccupancies[i] = 0;
+        }
+    }
+}
