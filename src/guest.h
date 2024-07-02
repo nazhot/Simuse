@@ -29,7 +29,7 @@ typedef struct Guest {
     uint attractionsRiddenIndexes[256];
 } Guest;
 
-int guest_determineNextAttraction( const struct Park *park, const Guest *guest );
+void guest_determineNextAttraction( const struct Park *park, Guest *guest );
 bool guest_decideToRideAttraction( const struct Park *park, const Guest *guest );
 Guest guest_create( const uint *attractionWeights, const uint numAttractions, 
                     const uint enterTime,

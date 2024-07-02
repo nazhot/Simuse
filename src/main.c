@@ -14,25 +14,31 @@
 #define LOG( ... ) (__ASSERT_VOID_CAST( 0 ))
 #endif
 
+/*
+    Attraction[0] will always be expected to be the exit
+*/
+
 int main( int argc, char *argv[] ) {
     srand48( time( NULL ) );
-    uint numAttractions = 4;
+    uint numAttractions = 5;
     uint timeOpen = 43200;
     Attraction attractions[numAttractions];
 
-    attractions[0] = attraction_create( "Attraction 1", 100, ( Vec2 ) { 600, 0 }, 120, 3, 10 );
-    attractions[1] = attraction_create( "Attraction 2", 100, ( Vec2 ) { 600, 600 }, 120, 3, 10 );
-    attractions[2] = attraction_create( "Attraction 3", 100, ( Vec2 ) { -600, 600 }, 120, 3, 10 );
-    attractions[3] = attraction_create( "Attraction 4", 100, ( Vec2 ) { -600, 0 }, 120, 3, 10 );
+    attractions[0] = attraction_create( "EXIT", 0, ( Vec2 ) { 0, 0 }, 0, 0, 0 );
+    attractions[1] = attraction_create( "Attraction 1", 100, ( Vec2 ) { 600, 0 }, 120, 3, 10 );
+    attractions[2] = attraction_create( "Attraction 2", 100, ( Vec2 ) { 600, 600 }, 120, 3, 10 );
+    attractions[3] = attraction_create( "Attraction 3", 100, ( Vec2 ) { -600, 600 }, 120, 3, 10 );
+    attractions[4] = attraction_create( "Attraction 4", 100, ( Vec2 ) { -600, 0 }, 120, 3, 10 );
 
     uint numGuests = 500;
     Guest guests[numGuests];
     {
         uint attractionWeights[numAttractions];
+        attractionWeights[0] = 0;
         uint enterTime;
         uint exitTime;
         for ( uint i = 0; i < numGuests; ++i ) {
-            for ( uint i = 0; i < numAttractions; ++i ) {
+            for ( uint i = 1; i < numAttractions; ++i ) {
                 attractionWeights[i] = 20;
             }
             enterTime = ( uint ) drand48() * ( timeOpen - 10800 ); //10800 is 3 hours
@@ -43,9 +49,8 @@ int main( int argc, char *argv[] ) {
 
     //0 index is exit, ( 0,0 )
     for ( uint i = 0; i < numAttractions; ++i ) {
-        attractions[i].attractionWalkTimes[0] = abs( attractions[i].position.x ) + abs( attractions[i].position.y );
         for ( uint j = 0; j < numAttractions; ++j ) {
-            attractions[i].attractionWalkTimes[j + 1] = abs( attractions[i].position.x - attractions[j].position.x ) +
+            attractions[i].attractionWalkTimes[j] = abs( attractions[i].position.x - attractions[j].position.x ) +
                                                         abs( attractions[i].position.y - attractions[j].position.y );
         }
     }
@@ -60,17 +65,15 @@ int main( int argc, char *argv[] ) {
     while ( park.currentTime < park.timeOpen ) {
         for ( uint i = 0; i < park.numGuests; ++i ) {
             Guest *guest = &park.guests[i];
-            Attraction *currentAttraction = &park.attractions[guest->currentAttractionIndex];
             if ( park.currentTime == guest->enterTime ) {
-                guest->currentAttractionIndex = guest_determineNextAttraction( &park, guest );
-                guest->currentStatus = WALKING;
-                guest->timeToAttraction = currentAttraction->attractionWalkTimes[0];
+                guest_determineNextAttraction( &park, guest );
                 if ( i == 0 ) {
                     LOG( "GUEST ENTERING: %u\n", park.currentTime );
-                    LOG( "HEADING TO ATTRACTION: %s\n", currentAttraction->name );
+                    LOG( "HEADING TO ATTRACTION: %s\n", park.attractions[guest->currentAttractionIndex].name );
                 }
                 continue;
             }
+            Attraction *currentAttraction = &park.attractions[guest->currentAttractionIndex];
             switch ( guest->currentStatus ) {
                 case WALKING:
                     guest->timeToAttraction--;
@@ -90,24 +93,42 @@ int main( int argc, char *argv[] ) {
                     }
                     break;
                 case IN_LINE:
-                    if ( currentAttraction->numOpenCars > 0 ) {
-                        if ( guest->linePosition < park.attractions[guest->currentAttractionIndex].guestsPerCar ) {
-                            guest->linePosition = 0;
-                            guest->currentStatus = RIDING;
-                            if ( i == 0 ) {
-                                LOG( "GUEST RIDING RIDE: %u\n", park.currentTime );
-                            }
-                            currentAttraction->carOccupancies[currentAttraction->firstOpenCarIndex]++;
-                        } else {
-                            guest->linePosition -= currentAttraction->guestsPerCar;
-                            guest->totalTimeInLine++;
-                            if ( i == 0 ) {
-                                LOG( "GUEST MOVED UP IN LINE, NEW POSITION %u: %u\n", guest->linePosition, park.currentTime );
-                            }
-                        }
-                    } else {
-                        guest->totalTimeInLine++;
+                    if ( currentAttraction->numGuestsLastLoaded == 0 ) {
+                        ++guest->totalTimeInLine;
+                        break;
                     }
+                    if ( guest->linePosition > currentAttraction->numGuestsLastLoaded ) {
+                        if ( i == 0 ) {
+                            LOG( "MOVED IN LINE FROM %u to %u: %u\n", guest->linePosition, guest->linePosition - currentAttraction->numGuestsLastLoaded, park.currentTime );
+                        }
+                        guest->linePosition -= currentAttraction->numGuestsLastLoaded;
+                        break;
+                    }
+
+                    //guest loaded into car
+                    guest->linePosition = 0;
+                    guest->carIndex = currentAttraction->carIndexLastLoaded;
+                    guest->currentStatus = RIDING;
+                    if ( i == 0 ) {
+                        LOG( "STARTING RIDING: %u\n", park.currentTime );
+                    }
+                    break;
+                case RIDING:
+                    //car still occupied, means it's still going
+                    if ( currentAttraction->carOccupancies[guest->carIndex] ) break;
+                    //car unoccupied, just returned
+                    guest_determineNextAttraction( &park, guest );
+                    if ( i == 0 ) {
+                        LOG( "GUEST FINISHED RIDE, NEXT ATTRACTION %s: %u\n", park.attractions[guest->currentAttractionIndex].name, park.currentTime );
+                    }
+                    if ( guest->currentAttractionIndex == 0 ) {
+                        guest->currentStatus = LEAVING;
+                        if ( i == 0 ) {
+                            LOG( "GUEST LEAVING BEFORE %u exitTime: %u\n", guest->exitTime, park.currentTime );
+                        }
+                    }
+                    break; 
+                    
                 default:
                     break;
             }

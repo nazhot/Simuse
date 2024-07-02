@@ -18,7 +18,9 @@ Attraction attraction_create( char *name, uint popularity, Vec2 position,
                             .carOccupancies = {0},
                             .numOpenCars = numCars,
                             .carOpen = true,
-                            .attractionWalkTimes = {0} }; 
+                            .attractionWalkTimes = {0},
+                            .numGuestsLastLoaded = 0,
+                            .carIndexLastLoaded = 0 };
 }
 
 void attraction_updateOpenCars( Attraction *attraction ) {
@@ -33,12 +35,14 @@ void attraction_updateOpenCars( Attraction *attraction ) {
     attraction->carOpen = false;
 }
 
-uint attraction_loadOpenCar( Attraction *attraction ) {
-    if ( !attraction->carOpen ) return 0;
+void attraction_loadOpenCar( Attraction *attraction ) {
+    attraction->numGuestsLastLoaded = 0;
+    if ( !attraction->carOpen ) return;
     uint numToLoad = attraction->guestsInLine > attraction->guestsPerCar ? attraction->guestsPerCar : attraction->guestsInLine;
     attraction->carOccupancies[attraction->firstOpenCarIndex] = numToLoad;
     attraction->carArrivalTimes[attraction->firstOpenCarIndex] = attraction->rideTime;
-    return numToLoad;
+    attraction->numGuestsLastLoaded = numToLoad;
+    attraction->carIndexLastLoaded = attraction->firstOpenCarIndex;
 }
 
 void attraction_unloadReturnedCar( Attraction *attraction ) {

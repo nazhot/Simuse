@@ -29,12 +29,14 @@ typedef struct Attraction {
     uint numOpenCars;
     bool carOpen;
     uint attractionWalkTimes[256];
+    uint numGuestsLastLoaded;
+    uint carIndexLastLoaded;
 } Attraction;
 
 Attraction attraction_create( char *name, uint popularity, Vec2 position, 
                               uint rideTime, uint numCars, uint guestsPerCar );
 void attraction_updateOpenCars( Attraction *attraction );
-uint attraction_loadOpenCar( Attraction *attraction );
+void attraction_loadOpenCar( Attraction *attraction );
 void attraction_unloadReturnedCar( Attraction *attraction );
 void attraction_updateArrivalTimes( Attraction *attraction );
 

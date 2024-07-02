@@ -15,7 +15,8 @@ static int numTimesRiddenAttraction( const Guest *guest, const uint attractionIn
 }
 
 
-int guest_determineNextAttraction( const Park *park, const Guest *guest ) {
+void guest_determineNextAttraction( const Park *park, Guest *guest ) {
+    //index 0, aka exit, will always have a score of 0 because the attraction weight should be 0
     uint index = 0;
     uint highestScore = 0;
     uint minWalkingTime = UINT_MAX;
@@ -33,11 +34,21 @@ int guest_determineNextAttraction( const Park *park, const Guest *guest ) {
             minWalkingTime = attractionWalkTime;
         }
     }
-    if ( minWalkingTime >= ( park->timeOpen - park->currentTime ) ) {
-        return 0;
+    if ( minWalkingTime >= ( park->timeOpen - park->currentTime ) || index == 0 ) { //time to leave
+        guest->currentStatus = LEAVING;
+        guest->currentAttractionIndex = 0;
+        guest->timeToAttraction = currentAttraction->attractionWalkTimes[0];
+        return;
     }
-    return index + 1;
-
+    if ( index == guest->currentAttractionIndex ) { //staying at same attraction
+        guest->timeToAttraction = 0;
+        guest->currentStatus = IN_LINE;
+        guest->linePosition = currentAttraction->guestsInLine++;
+        return;
+    }
+    guest->currentStatus = WALKING;
+    guest->currentAttractionIndex = index;
+    guest->timeToAttraction = currentAttraction->attractionWalkTimes[index];
 }
 
 bool guest_decideToRideAttraction( const Park *park, const Guest *guest ) {
@@ -57,5 +68,8 @@ Guest guest_create( const uint *attractionWeights, const uint numAttractions,
                     .totalTimeInLine = 0,
                     .numAttractionsRidden = 0,
                     .attractionsRiddenIndexes = {0} };
+    for ( uint i = 0; i < numAttractions; ++i ) {
+        guest.attractionWeights[i] = attractionWeights[i];
+    }
     return guest;
 }
