@@ -163,5 +163,32 @@ int main( int argc, char *argv[] ) {
         park.currentTime++;
     }
 
+    uint totalRides = 0;
+    uint totalTimeInPark = 0;
+    uint attractionTotalRides[numAttractions];
+    uint totalWaitTimes = 0;
+    
+    for ( uint i = 0; i < numAttractions; ++i ) {
+        attractionTotalRides[i] = 0;
+    }
+
+    for ( uint i = 0; i < numGuests; ++i ) { 
+        totalRides += guests[i].numAttractionsRidden;
+        for ( uint j = 0; j < guests[i].numAttractionsRidden; ++j ) {
+            attractionTotalRides[guests[i].attractionsRiddenIndexes[j]]++;
+        }
+        totalTimeInPark += guests[i].exitTime - guests[i].enterTime;
+        totalWaitTimes += guests[i].totalTimeInLine;
+    }
+
+    printf( "Average Rides: %.2f\n", 1.0 * totalRides / numGuests );
+    printf( "Average Time in Park: %.2f\n", 1.0 * totalTimeInPark / numGuests );
+    printf( "Average Wait Time: %.2f\n", 1.0 * totalWaitTimes / numGuests );
+    for ( uint i = 1; i < numAttractions; ++i ) {
+        printf( "Average Rides on %s: %.2f\n", park.attractions[i].name, 1.0 * attractionTotalRides[i] / numGuests );
+    }
+
+    free( guests );
+
     return 0;
 }
