@@ -1,0 +1,39 @@
+[Exit]
+X = 0
+Y = 0
+Popularity = 0
+RideTime = 0
+NumCars = 0
+GuestsPerCar = 0
+
+[Avatar Flight of Passage]
+X = -300
+Y = 0
+Popularity = 50
+RideTime = 264
+NumCars = 4
+GuestsPerCar = 48
+
+[Expedition Everest]
+X = -300
+Y = 300
+Popularity = 25
+RideTime = 170
+NumCars = 5
+GuestsPerCar = 34
+
+[DINOSAUR]
+X = 300
+Y = 300
+Popularity = 20
+RideTime = 185
+NumCars = 5
+GuestsPerCar = 12
+
+[Kali River Rapids]
+X = 300
+Y = 0
+Popularity = 10
+RideTime = 300
+NumCars = 20
+GuestsPerCar = 12

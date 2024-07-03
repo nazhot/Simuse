@@ -12,7 +12,7 @@ typedef struct Vec2 {
 } Vec2;
 
 typedef struct Attraction {
-    char *name;
+    char name[256];
     uint popularity;
     Vec2 position;
     uint guestsInFastLane;
@@ -33,12 +33,13 @@ typedef struct Attraction {
     uint carIndexLastLoaded;
 } Attraction;
 
-Attraction attraction_create( char *name, uint popularity, Vec2 position, 
-                              uint rideTime, uint numCars, uint guestsPerCar );
+Attraction attraction_create( const char *name, const uint popularity, const Vec2 position, 
+                              const uint rideTime, const uint numCars, const uint guestsPerCar );
 void attraction_updateWaitTime( Attraction *attraction );
 void attraction_updateOpenCars( Attraction *attraction );
 void attraction_loadOpenCar( Attraction *attraction );
 void attraction_unloadReturnedCar( Attraction *attraction );
 void attraction_updateArrivalTimes( Attraction *attraction );
+void attraction_print( Attraction *attraction );
 
 #endif

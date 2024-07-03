@@ -3,6 +3,7 @@
 #include <time.h>
 #include "attraction.h"
 #include "guest.h"
+#include "importer.h"
 #include "park.h"
 #include <assert.h>
 
@@ -19,19 +20,30 @@
 */
 
 int main( int argc, char *argv[] ) {
+    if ( argc != 2 ) {
+        fprintf( stderr, "Requires (1) argument, file name of the attractions\n" );
+        exit( 1 );
+    }
+    const char *fileName = argv[1];
     srand48( time( NULL ) );
     clock_t startTime = clock();
-    uint numAttractions = 5;
+    uint numAttractions;
     uint timeOpen = 43200;
-    Attraction attractions[numAttractions];
+    Attraction attractions[256];
 
+    importAttractionsFromFile( fileName, attractions, &numAttractions );
+    for ( uint i = 0; i < numAttractions; ++i ) {
+        attraction_print( &attractions[i] );
+    }
+
+/*
     attractions[0] = attraction_create( "EXIT", 0, ( Vec2 ) { 0, 0 }, 0, 0, 0 );
     attractions[1] = attraction_create( "Attraction 1", 100, ( Vec2 ) { 300, 0 }, 120, 4, 20 );
     attractions[2] = attraction_create( "Attraction 2", 100, ( Vec2 ) { 300, 300 }, 120, 3, 10 );
     attractions[3] = attraction_create( "Attraction 3", 100, ( Vec2 ) { -300, 300 }, 120, 3, 10 );
     attractions[4] = attraction_create( "Attraction 4", 100, ( Vec2 ) { -300, 0 }, 120, 3, 10 );
-
-    uint numGuests = 50000;
+*/
+    uint numGuests = 5000;
     Guest *guests = malloc( sizeof( Guest ) * numGuests );
     {
         uint attractionWeights[numAttractions];
