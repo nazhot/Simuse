@@ -52,9 +52,16 @@ void guest_determineNextAttraction( const Park *park, Guest *guest, const bool a
     guest->timeToAttraction = currentAttraction->attractionWalkTimes[index];
 }
 
-bool guest_decideToRideAttraction( const Park *park, const Guest *guest ) {
-    int guestExpectedWait = 120 - guest->attractionWeights[guest->currentAttractionIndex];
-    return park->attractions[guest->currentAttractionIndex].currentWaitTime <= guestExpectedWait;
+bool guest_decideToRideAttraction( const Park *park, Guest *guest ) {
+    int guestExpectedWait = ( 120 + 20 * guest->numFailedAttractionsInARow ) - guest->attractionWeights[guest->currentAttractionIndex];
+    bool answer = park->attractions[guest->currentAttractionIndex].currentWaitTime <= guestExpectedWait;
+    if ( answer ) {
+        guest->numFailedAttractionsInARow = 0;
+    } else { 
+        ++guest->numFailedAttractionsInARow;
+        ++guest->totalAttractionsSkipped;
+    }
+    return answer;
 }
 
 Guest guest_create( const uint *attractionWeights, const uint numAttractions,
@@ -70,8 +77,10 @@ Guest guest_create( const uint *attractionWeights, const uint numAttractions,
                     .totalTimeInLine = 0,
                     .totalTimeWalking = 0,
                     .totalTimeRiding = 0,
+                    .totalAttractionsSkipped = 0,
                     .numAttractionsRidden = 0,
-                    .attractionsRiddenIndexes = {0} };
+                    .attractionsRiddenIndexes = {0},
+                    .numFailedAttractionsInARow = 0 };
     for ( uint i = 0; i < numAttractions; ++i ) {
         guest.attractionWeights[i] = attractionWeights[i];
     }

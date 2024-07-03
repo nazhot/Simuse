@@ -27,12 +27,14 @@ typedef struct Guest {
     uint totalTimeInLine;
     uint totalTimeWalking;
     uint totalTimeRiding;
+    uint totalAttractionsSkipped;
     uint numAttractionsRidden;
     uint attractionsRiddenIndexes[256];
+    uint numFailedAttractionsInARow;
 } Guest;
 
 void guest_determineNextAttraction( const struct Park *park, Guest *guest, const bool allowSameAttraction );
-bool guest_decideToRideAttraction( const struct Park *park, const Guest *guest );
+bool guest_decideToRideAttraction( const struct Park *park, Guest *guest );
 Guest guest_create( const uint *attractionWeights, const uint numAttractions, 
                     const uint enterTime,
                     uint exitTime );

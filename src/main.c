@@ -25,10 +25,10 @@ int main( int argc, char *argv[] ) {
     Attraction attractions[numAttractions];
 
     attractions[0] = attraction_create( "EXIT", 0, ( Vec2 ) { 0, 0 }, 0, 0, 0 );
-    attractions[1] = attraction_create( "Attraction 1", 100, ( Vec2 ) { 600, 0 }, 120, 3, 10 );
-    attractions[2] = attraction_create( "Attraction 2", 100, ( Vec2 ) { 600, 600 }, 120, 3, 10 );
-    attractions[3] = attraction_create( "Attraction 3", 100, ( Vec2 ) { -600, 600 }, 120, 3, 10 );
-    attractions[4] = attraction_create( "Attraction 4", 100, ( Vec2 ) { -600, 0 }, 120, 3, 10 );
+    attractions[1] = attraction_create( "Attraction 1", 100, ( Vec2 ) { 300, 0 }, 120, 4, 20 );
+    attractions[2] = attraction_create( "Attraction 2", 100, ( Vec2 ) { 300, 300 }, 120, 3, 10 );
+    attractions[3] = attraction_create( "Attraction 3", 100, ( Vec2 ) { -300, 300 }, 120, 3, 10 );
+    attractions[4] = attraction_create( "Attraction 4", 100, ( Vec2 ) { -300, 0 }, 120, 3, 10 );
 
     uint numGuests = 5000;
     Guest *guests = malloc( sizeof( Guest ) * numGuests );
@@ -167,6 +167,7 @@ int main( int argc, char *argv[] ) {
     uint totalWaitTimes = 0;
     uint totalWalkTimes = 0;
     uint totalRideTimes = 0;
+    uint totalAttractionsSkipped = 0;
     uint totalRideWeights[numAttractions];
     
     for ( uint i = 0; i < numAttractions; ++i ) {
@@ -176,6 +177,7 @@ int main( int argc, char *argv[] ) {
 
     for ( uint i = 0; i < numGuests; ++i ) { 
         totalRides += guests[i].numAttractionsRidden;
+        totalAttractionsSkipped += guests[i].totalAttractionsSkipped;
         for ( uint j = 0; j < guests[i].numAttractionsRidden; ++j ) {
             attractionTotalRides[guests[i].attractionsRiddenIndexes[j]]++;
         }
@@ -189,6 +191,7 @@ int main( int argc, char *argv[] ) {
     }
 
     printf( "Average Rides: %.2f\n", 1.0 * totalRides / numGuests );
+    printf( "Average Rides Skipped: %.2f\n", 1.0 * totalAttractionsSkipped / numGuests );
     printf( "Average Time in Park: %.2f\n", 1.0 * totalTimeInPark / numGuests );
     printf( "Average Wait Time: %.2f\n", 1.0 * totalWaitTimes / numGuests );
     printf( "Average Walk Time: %.2f\n", 1.0 * totalWalkTimes / numGuests );
