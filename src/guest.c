@@ -68,6 +68,8 @@ Guest guest_create( const uint *attractionWeights, const uint numAttractions,
                     .enterTime = enterTime,
                     .exitTime = exitTime,
                     .totalTimeInLine = 0,
+                    .totalTimeWalking = 0,
+                    .totalTimeRiding = 0,
                     .numAttractionsRidden = 0,
                     .attractionsRiddenIndexes = {0} };
     for ( uint i = 0; i < numAttractions; ++i ) {

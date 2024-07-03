@@ -96,11 +96,13 @@ int main( int argc, char *argv[] ) {
                         }
                         break;
                     }
+                    ++guest->totalTimeWalking;
                     --guest->timeToAttraction;
                     break;
                 case LEAVING:
                     if ( guest->timeToAttraction == 0 ) guest->currentStatus = GONE;
-                    guest->timeToAttraction--;
+                    ++guest->totalTimeWalking;
+                    --guest->timeToAttraction;
                     if ( i == 0 && guest->currentStatus == GONE ) {
                         LOG( "GUEST LEFT AT %u\n", park.currentTime );
                     }
@@ -130,20 +132,16 @@ int main( int argc, char *argv[] ) {
                     break;
                 case RIDING:
                     //car still occupied, means it's still going
-                    if ( currentAttraction->carOccupancies[guest->carIndex] ) break;
+                    if ( currentAttraction->carOccupancies[guest->carIndex] ) {
+                        ++guest->totalTimeRiding;
+                        break;
+                    }
                     //car unoccupied, just returned
                     guest_determineNextAttraction( &park, guest, true );
                     if ( i == 0 ) {
                         LOG( "GUEST FINISHED RIDE, NEXT ATTRACTION %s: %u\n", park.attractions[guest->currentAttractionIndex].name, park.currentTime );
                     }
-                    if ( guest->currentAttractionIndex == 0 ) {
-                        guest->currentStatus = LEAVING;
-                        if ( i == 0 ) {
-                            LOG( "GUEST LEAVING BEFORE %u exitTime: %u\n", guest->exitTime, park.currentTime );
-                        }
-                    }
                     break; 
-                    
                 default:
                     break;
             }
@@ -167,9 +165,13 @@ int main( int argc, char *argv[] ) {
     uint totalTimeInPark = 0;
     uint attractionTotalRides[numAttractions];
     uint totalWaitTimes = 0;
+    uint totalWalkTimes = 0;
+    uint totalRideTimes = 0;
+    uint totalRideWeights[numAttractions];
     
     for ( uint i = 0; i < numAttractions; ++i ) {
         attractionTotalRides[i] = 0;
+        totalRideWeights[i] = 0;
     }
 
     for ( uint i = 0; i < numGuests; ++i ) { 
@@ -177,15 +179,23 @@ int main( int argc, char *argv[] ) {
         for ( uint j = 0; j < guests[i].numAttractionsRidden; ++j ) {
             attractionTotalRides[guests[i].attractionsRiddenIndexes[j]]++;
         }
+        for ( uint j = 1; j < numAttractions; ++j ) {
+            totalRideWeights[j] += guests[i].attractionWeights[j];
+        }
         totalTimeInPark += guests[i].exitTime - guests[i].enterTime;
         totalWaitTimes += guests[i].totalTimeInLine;
+        totalWalkTimes += guests[i].totalTimeWalking;
+        totalRideTimes += guests[i].totalTimeRiding;
     }
 
     printf( "Average Rides: %.2f\n", 1.0 * totalRides / numGuests );
     printf( "Average Time in Park: %.2f\n", 1.0 * totalTimeInPark / numGuests );
     printf( "Average Wait Time: %.2f\n", 1.0 * totalWaitTimes / numGuests );
+    printf( "Average Walk Time: %.2f\n", 1.0 * totalWalkTimes / numGuests );
+    printf( "Average Ride Time: %.2f\n", 1.0 * totalRideTimes / numGuests );
     for ( uint i = 1; i < numAttractions; ++i ) {
         printf( "Average Rides on %s: %.2f\n", park.attractions[i].name, 1.0 * attractionTotalRides[i] / numGuests );
+        printf( "Average Weight: %.2f\n", 1.0 * totalRideWeights[i] / numGuests );
     }
 
     free( guests );

@@ -25,6 +25,8 @@ typedef struct Guest {
     uint enterTime;
     uint exitTime;
     uint totalTimeInLine;
+    uint totalTimeWalking;
+    uint totalTimeRiding;
     uint numAttractionsRidden;
     uint attractionsRiddenIndexes[256];
 } Guest;
