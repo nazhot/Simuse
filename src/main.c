@@ -20,6 +20,7 @@
 
 int main( int argc, char *argv[] ) {
     srand48( time( NULL ) );
+    clock_t startTime = clock();
     uint numAttractions = 5;
     uint timeOpen = 43200;
     Attraction attractions[numAttractions];
@@ -30,7 +31,7 @@ int main( int argc, char *argv[] ) {
     attractions[3] = attraction_create( "Attraction 3", 100, ( Vec2 ) { -300, 300 }, 120, 3, 10 );
     attractions[4] = attraction_create( "Attraction 4", 100, ( Vec2 ) { -300, 0 }, 120, 3, 10 );
 
-    uint numGuests = 5000;
+    uint numGuests = 50000;
     Guest *guests = malloc( sizeof( Guest ) * numGuests );
     {
         uint attractionWeights[numAttractions];
@@ -47,7 +48,7 @@ int main( int argc, char *argv[] ) {
         }
     }
 
-    //0 index is exit, ( 0,0 )
+    //0 index is exit
     for ( uint i = 0; i < numAttractions; ++i ) {
         for ( uint j = 0; j < numAttractions; ++j ) {
             attractions[i].attractionWalkTimes[j] = abs( attractions[i].position.x - attractions[j].position.x ) +
@@ -69,16 +70,16 @@ int main( int argc, char *argv[] ) {
         }
         for ( uint i = 0; i < park.numGuests; ++i ) {
             Guest *guest = &park.guests[i];
-            if ( park.currentTime == guest->enterTime ) {
-                guest_determineNextAttraction( &park, guest, false );
-                if ( i == 0 ) {
-                    LOG( "GUEST ENTERING: %u\n", park.currentTime );
-                    LOG( "HEADING TO ATTRACTION: %s\n", park.attractions[guest->currentAttractionIndex].name );
-                }
-                continue;
-            }
             Attraction *currentAttraction = &park.attractions[guest->currentAttractionIndex];
             switch ( guest->currentStatus ) {
+                case ARRIVING:
+                    if ( park.currentTime < guest->enterTime ) break;
+                    guest_determineNextAttraction( &park, guest, false );
+                    if ( i == 0 ) {
+                        LOG( "GUEST ENTERING: %u\n", park.currentTime );
+                        LOG( "HEADING TO ATTRACTION: %s\n", park.attractions[guest->currentAttractionIndex].name );
+                    }
+                    break;
                 case WALKING:
                     if ( guest->timeToAttraction == 0 ) {
                         if ( guest_decideToRideAttraction( &park, guest ) ) {
@@ -200,6 +201,10 @@ int main( int argc, char *argv[] ) {
         printf( "Average Rides on %s: %.2f\n", park.attractions[i].name, 1.0 * attractionTotalRides[i] / numGuests );
         printf( "Average Weight: %.2f\n", 1.0 * totalRideWeights[i] / numGuests );
     }
+    clock_t diffTime = clock() - startTime;
+    int msec = diffTime * 1000 / CLOCKS_PER_SEC;
+    printf( "Runtime: %d seconds %d milliseconds\n", msec / 1000, msec % 1000 );
+
 
     free( guests );
 
