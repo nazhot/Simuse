@@ -55,8 +55,10 @@ int main( int argc, char *argv[] ) {
                 attractionWeights[j] = ( uint ) ( drand48() * 99 + 1 );
             }
             enterTime = ( uint ) ( drand48() * ( timeOpen - 10800 ) ); //10800 is 3 hours
-            exitTime = ( uint ) ( drand48() * ( timeOpen - enterTime )+ 10800 );
+            exitTime = enterTime + ( uint ) ( drand48() * ( timeOpen - enterTime - 10800 ) + 10800 );
+            //exitTime = ( uint ) ( drand48() * ( timeOpen - enterTime ) + 10800 );
             guests[i] = guest_create( attractionWeights, numAttractions, enterTime, exitTime );
+            printf( "%u:%u (%u)\n", enterTime, exitTime, exitTime - enterTime );
         }
     }
 
@@ -127,7 +129,7 @@ int main( int argc, char *argv[] ) {
                     }
                     if ( guest->linePosition >= currentAttraction->numGuestsLastLoaded ) {
                         if ( i == 0 ) {
-                            LOG( "MOVED IN LINE FROM %u to %u: %u\n", guest->linePosition, guest->linePosition - currentAttraction->numGuestsLastLoaded, park.currentTime );
+                            //LOG( "MOVED IN LINE FROM %u to %u: %u\n", guest->linePosition, guest->linePosition - currentAttraction->numGuestsLastLoaded, park.currentTime );
                         }
                         guest->linePosition -= currentAttraction->numGuestsLastLoaded;
                         ++guest->totalTimeInLine;
