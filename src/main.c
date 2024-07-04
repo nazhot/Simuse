@@ -25,7 +25,8 @@ int main( int argc, char *argv[] ) {
         exit( 1 );
     }
     const char *fileName = argv[1];
-    srand48( time( NULL ) );
+    const uint seed = time( NULL );
+    srand48( seed );
     clock_t startTime = clock();
     uint numAttractions;
     uint timeOpen = 43200;
@@ -205,20 +206,23 @@ int main( int argc, char *argv[] ) {
         totalRideTimes += guests[i].totalTimeRiding;
     }
 
-    printf( "Average Rides: %.2f\n", 1.0 * totalRides / numGuests );
-    printf( "Average Rides Skipped: %.2f\n", 1.0 * totalAttractionsSkipped / numGuests );
-    printf( "Average Time in Park: %.2f\n", 1.0 * totalTimeInPark / numGuests );
-    printf( "Average Wait Time: %.2f\n", 1.0 * totalWaitTimes / numGuests );
-    printf( "Average Walk Time: %.2f\n", 1.0 * totalWalkTimes / numGuests );
-    printf( "Average Ride Time: %.2f\n", 1.0 * totalRideTimes / numGuests );
+    FILE *outputFile = fopen( "output", "w" );
+    fprintf( outputFile, "Seed: %u\n", seed );
+    fprintf( outputFile, "Average Rides: %.2f\n", 1.0 * totalRides / numGuests );
+    fprintf( outputFile, "Average Rides Skipped: %.2f\n", 1.0 * totalAttractionsSkipped / numGuests );
+    fprintf( outputFile, "Average Time in Park: %.2f\n", 1.0 * totalTimeInPark / numGuests );
+    fprintf( outputFile, "Average Wait Time: %.2f\n", 1.0 * totalWaitTimes / numGuests );
+    fprintf( outputFile, "Average Walk Time: %.2f\n", 1.0 * totalWalkTimes / numGuests );
+    fprintf( outputFile, "Average Ride Time: %.2f\n", 1.0 * totalRideTimes / numGuests );
     for ( uint i = 1; i < numAttractions; ++i ) {
-        printf( "Average Rides on %s: %.2f\n", park.attractions[i].name, 1.0 * attractionTotalRides[i] / numGuests );
-        printf( "Average Weight: %.2f\n", 1.0 * totalRideWeights[i] / numGuests );
+        fprintf( outputFile, "Average Rides on %s: %.2f\n", park.attractions[i].name, 1.0 * attractionTotalRides[i] / numGuests );
+        fprintf( outputFile, "Average Weight: %.2f\n", 1.0 * totalRideWeights[i] / numGuests );
     }
     clock_t diffTime = clock() - startTime;
     int msec = diffTime * 1000 / CLOCKS_PER_SEC;
-    printf( "Runtime: %d seconds %d milliseconds\n", msec / 1000, msec % 1000 );
+    fprintf( outputFile, "Runtime: %d seconds %d milliseconds\n", msec / 1000, msec % 1000 );
 
+    fclose( outputFile );
 
     free( guests );
 
