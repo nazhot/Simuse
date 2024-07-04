@@ -1,6 +1,7 @@
 #ifndef ATTRACTION_H
 #define ATTRACTION_H
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -40,6 +41,6 @@ void attraction_updateOpenCars( Attraction *attraction );
 void attraction_loadOpenCar( Attraction *attraction );
 void attraction_unloadReturnedCar( Attraction *attraction );
 void attraction_updateArrivalTimes( Attraction *attraction );
-void attraction_print( Attraction *attraction );
+void attraction_print( Attraction *attraction, FILE *file );
 
 #endif

@@ -76,9 +76,9 @@ void attraction_updateArrivalTimes( Attraction *attraction ) {
     }
 }
 
-void attraction_print( Attraction *attraction ) {
-    printf( "--%s--\n", attraction->name );
-    printf( "Popularity: %u\tX,Y: %i,%i\n", attraction->popularity, attraction->position.x, attraction->position.y );
-    printf( "Num Cars: %u\tGuests per Car: %u\n", attraction->numCars, attraction->guestsPerCar );
-    printf( "Ride Time: %u\n", attraction->rideTime );
+void attraction_print( Attraction *attraction, FILE *file ) {
+    fprintf( file, "--%s--\n", attraction->name );
+    fprintf( file, "Popularity: %u\tX,Y: %i,%i\n", attraction->popularity, attraction->position.x, attraction->position.y );
+    fprintf( file, "Num Cars: %u\tGuests per Car: %u\n", attraction->numCars, attraction->guestsPerCar );
+    fprintf( file, "Ride Time: %u\n", attraction->rideTime );
 }

@@ -33,9 +33,6 @@ int main( int argc, char *argv[] ) {
     Attraction attractions[256];
 
     importAttractionsFromFile( fileName, attractions, &numAttractions );
-    for ( uint i = 0; i < numAttractions; ++i ) {
-        attraction_print( &attractions[i] );
-    }
 
 /*
     attractions[0] = attraction_create( "EXIT", 0, ( Vec2 ) { 0, 0 }, 0, 0, 0 );
@@ -57,9 +54,7 @@ int main( int argc, char *argv[] ) {
             }
             enterTime = ( uint ) ( drand48() * ( timeOpen - 10800 ) ); //10800 is 3 hours
             exitTime = enterTime + ( uint ) ( drand48() * ( timeOpen - enterTime - 10800 ) + 10800 );
-            //exitTime = ( uint ) ( drand48() * ( timeOpen - enterTime ) + 10800 );
             guests[i] = guest_create( attractionWeights, numAttractions, enterTime, exitTime );
-            printf( "%u:%u (%u)\n", enterTime, exitTime, exitTime - enterTime );
         }
     }
 
@@ -208,6 +203,10 @@ int main( int argc, char *argv[] ) {
 
     FILE *outputFile = fopen( "output", "w" );
     fprintf( outputFile, "Seed: %u\n", seed );
+    for ( uint i = 0; i < numAttractions; ++i ) {
+        attraction_print( &attractions[i], outputFile );
+    }
+    fprintf( outputFile, "\n" );
     fprintf( outputFile, "Average Rides: %.2f\n", 1.0 * totalRides / numGuests );
     fprintf( outputFile, "Average Rides Skipped: %.2f\n", 1.0 * totalAttractionsSkipped / numGuests );
     fprintf( outputFile, "Average Time in Park: %.2f\n", 1.0 * totalTimeInPark / numGuests );
