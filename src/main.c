@@ -56,7 +56,16 @@ int main( int argc, char *argv[] ) {
         for ( uint i = 0; i < numGuests; ++i ) {
             attractionWeightTotal = 0;
             for ( uint j = 1; j < numAttractions; ++j ) {
-                attractionWeights[j] = ( uint ) ( drand48() * 99 + 1 );
+                int popularity = attractions[j].popularity;
+                int closestToPopularity = -popularity;
+                int weight;
+                for ( uint k = 0; k < 2; ++k ) {
+                    weight = ( int ) ( drand48() * ( 100 ) + 1 );
+                    if ( abs( weight - popularity ) < abs( closestToPopularity - popularity ) ) {
+                        closestToPopularity = weight;
+                    }
+                }
+                attractionWeights[j] = closestToPopularity; 
                 attractionWeightTotal += attractionWeights[j];
             }
             for ( uint j = 1; j < numAttractions; ++j ) {
