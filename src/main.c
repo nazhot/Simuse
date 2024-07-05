@@ -57,7 +57,7 @@ int main( int argc, char *argv[] ) {
             attractionWeightTotal = 0;
             for ( uint j = 1; j < numAttractions; ++j ) {
                 int popularity = attractions[j].popularity;
-                int closestToPopularity = -popularity;
+                int closestToPopularity = 1000;
                 int weight;
                 for ( uint k = 0; k < 2; ++k ) {
                     weight = ( int ) ( drand48() * ( 100 ) + 1 );
@@ -198,7 +198,7 @@ int main( int argc, char *argv[] ) {
     uint totalWalkTimes = 0;
     uint totalRideTimes = 0;
     uint totalAttractionsSkipped = 0;
-    uint totalRideWeights[numAttractions];
+    float totalRideWeights[numAttractions];
     
     for ( uint i = 0; i < numAttractions; ++i ) {
         attractionTotalRides[i] = 0;
@@ -226,6 +226,14 @@ int main( int argc, char *argv[] ) {
         attraction_print( &attractions[i], outputFile );
     }
     fprintf( outputFile, "\n" );
+    fprintf( outputFile, "[" );
+    for ( uint i = 1; i < numAttractions; ++i ) {
+        if ( i != 1 ) {
+            fprintf( outputFile, "," );
+        }
+        fprintf( outputFile, "%.2f", guests[0].attractionWeights[i] );
+    }
+    fprintf( outputFile, "]\n" );
     fprintf( outputFile, "Average Rides: %.2f\n", 1.0 * totalRides / numGuests );
     fprintf( outputFile, "Average Rides Skipped: %.2f\n", 1.0 * totalAttractionsSkipped / numGuests );
     fprintf( outputFile, "Average Time in Park: %.2f\n", 1.0 * totalTimeInPark / numGuests );
