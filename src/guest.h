@@ -16,7 +16,7 @@ typedef enum GuestStatus{
 } GuestStatus;
 
 typedef struct Guest {
-    uint attractionWeights[256];
+    float attractionWeights[256];
     uint currentAttractionIndex;
     GuestStatus currentStatus;
     uint timeToAttraction;
@@ -35,7 +35,7 @@ typedef struct Guest {
 
 void guest_determineNextAttraction( const struct Park *park, Guest *guest, const bool allowSameAttraction );
 bool guest_decideToRideAttraction( const struct Park *park, Guest *guest );
-Guest guest_create( const uint *attractionWeights, const uint numAttractions, 
+Guest guest_create( const float *attractionWeights, const uint numAttractions, 
                     const uint enterTime,
                     uint exitTime );
 

@@ -19,6 +19,10 @@
     Attraction[0] will always be expected to be the exit
 */
 
+
+
+
+
 int main( int argc, char *argv[] ) {
     if ( argc != 2 ) {
         fprintf( stderr, "Requires (1) argument, file name of the attractions\n" );
@@ -44,13 +48,19 @@ int main( int argc, char *argv[] ) {
     uint numGuests = 5000;
     Guest *guests = malloc( sizeof( Guest ) * numGuests );
     {
-        uint attractionWeights[numAttractions];
+        float attractionWeights[numAttractions];
         attractionWeights[0] = 0;
         uint enterTime;
         uint exitTime;
+        float attractionWeightTotal;
         for ( uint i = 0; i < numGuests; ++i ) {
+            attractionWeightTotal = 0;
             for ( uint j = 1; j < numAttractions; ++j ) {
                 attractionWeights[j] = ( uint ) ( drand48() * 99 + 1 );
+                attractionWeightTotal += attractionWeights[j];
+            }
+            for ( uint j = 1; j < numAttractions; ++j ) {
+                attractionWeights[j] /= attractionWeightTotal;
             }
             enterTime = ( uint ) ( drand48() * ( timeOpen - 10800 ) ); //10800 is 3 hours
             exitTime = enterTime + ( uint ) ( drand48() * ( timeOpen - enterTime - 10800 ) + 10800 );

@@ -22,15 +22,24 @@ void guest_determineNextAttraction( const Park *park, Guest *guest, const bool a
     uint minWalkingTime = UINT_MAX;
     uint score;
     Attraction *currentAttraction = &park->attractions[guest->currentAttractionIndex];
+    float randomFloat = drand48();
+    bool choiceFound = false;
+    float cumulativeTotal = 0;
     for ( uint i = 1; i < park->numAttractions; ++i ) {  
         if ( !allowSameAttraction && i == guest->currentAttractionIndex ) continue;
-        uint attractionWalkTime = currentAttraction->attractionWalkTimes[i + 1];
-        score = ( guest->attractionWeights[i] * guest->attractionWeights[i] ) / 
-                ( attractionWalkTime / 60 * numTimesRiddenAttraction( guest, i ) + 1);
-        if ( score > highestScore ) {
-            highestScore = score;
+        cumulativeTotal += guest->attractionWeights[i];
+        if ( !choiceFound && randomFloat <= cumulativeTotal ) {
             index = i;
+            choiceFound = true;
         }
+
+        uint attractionWalkTime = currentAttraction->attractionWalkTimes[i + 1];
+//        score = ( guest->attractionWeights[i] * guest->attractionWeights[i] ) / 
+//                ( attractionWalkTime / 60 * numTimesRiddenAttraction( guest, i ) + 1);
+//        if ( score > highestScore ) {
+//            highestScore = score;
+//            index = i;
+//        }
         if ( attractionWalkTime < minWalkingTime ) {
             minWalkingTime = attractionWalkTime;
         }
@@ -64,7 +73,7 @@ bool guest_decideToRideAttraction( const Park *park, Guest *guest ) {
     return answer;
 }
 
-Guest guest_create( const uint *attractionWeights, const uint numAttractions,
+Guest guest_create( const float *attractionWeights, const uint numAttractions,
                     const uint enterTime, const uint exitTime ) {
     Guest guest = { .attractionWeights = {0},
                     .currentAttractionIndex = 0,
